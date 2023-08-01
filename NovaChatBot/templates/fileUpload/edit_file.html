@@ -6,14 +6,19 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>Edit File</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Save</button>
-            <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
-        </form>
+<div class="container mt-5">
+    <h2>Edit File</h2>
+    {% if messages %}
+    <div class="alert alert-success">
+        {{ messages }}
     </div>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'file_list_view' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
 </body>
 </html>

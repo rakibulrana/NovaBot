@@ -8,10 +8,27 @@
 </head>
 <body>
   {% include 'NavBar/navbar.html' %}
+
+<!-- for message after uploading a file -->
+  {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+  <!-- End! message after uploading a file -->
+
     <div class="container mt-5">
         <form method="post" enctype="multipart/form-data" action="{% url 'upload_file' %}">
             {% csrf_token %}
-            {{ form.as_p }}
+            {{ form.as_p }}   <!-- this is the django built-in library to upload a file only problem we always have to give a name manually! -->
 
             <!-- <div class="form-group">
                 <label for="file">Upload File</label>
