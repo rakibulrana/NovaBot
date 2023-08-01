@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+{% include 'NavBar/navbar.html' %}
+    <div class="container mt-5">
+
+        <h2>Uploaded Files</h2>
+        <ul class="list-group mt-3">
+            {% for file in files %}
+                <li class="list-group-item">
+                    {{ file.name }} (Uploaded on: {{ file.uploaded_date }})
+                    <a href="{% url 'edit_file' file.id %}" class="btn btn-primary btn-sm">Edit Name</a>
+                    <a href="{% url 'delete_file' file.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+{% include 'headerFooter/footer.html' %}
+</html>

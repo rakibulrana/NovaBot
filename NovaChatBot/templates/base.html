@@ -1,0 +1,78 @@
+<!-- base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NovaChatBot</title>
+    <!-- Include Bootstrap CSS -->
+
+    <style>
+        /* Custom styles for the separated areas */
+        .section {
+            padding: 30px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+{% include 'NavBar/navbar.html' %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Your Home Page Content Goes Here -->
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Additional Sections (Rows) -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="section">
+                <h2>NOVA CHAT BOT</h2>
+                <p>
+                    Introducing BioSignalML - <strong>NOVA Chat Bot</strong>, Your open-source solution for
+                    cutting-edge biomedical signal analysis with the power of machine
+                    learning.Seamlessly process ECG, EEG, and more, unlocking invaluable
+                    insights for medical diagnostics and research. Accelerate breakthroughs in healthcare using our user-friendly
+                    platform for data-driven discoveries.
+                </p>
+                <p>
+                    Harness the potential of machine learning technologies, including deep learning and feature
+                    extraction, to unlock invaluable insights from complex datasets. Whether you're a researcher,
+                    clinician, or student, BioSignalML empowers you to advance healthcare diagnostics, monitoring, and
+                    research with its user-friendly interface and customizable modules. Join the open-source community
+                    and revolutionize biomedical signal analysis today.
+                </p>
+                <a href="{% url 'upload_file' %}">Click here for upload file....</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+    <div class="section">
+        <!--<h2>Section 2</h2>
+        <p>This is the content of section 2. Add your content here.</p>-->
+
+        <!-- Web Image -->
+        <div style="max-width: 100%; max-height: 300%; overflow: hidden;">
+            <img src="https://media.istockphoto.com/id/1358653599/vector/brain-wave-3d.jpg?s=612x612&w=0&k=20&c=PFLn8lZUJtdALeLCDeIUBKVt4paDKwBDPatvtcyA2w8=" alt="Web Image" style="width: 100%; height: auto;">
+            <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); background-color: rgba(255, 255, 255, 0.8); padding: 5px;">
+                Image Source: Google
+        </div>
+    </div>
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Include the footer -->
+
+
+</div>
+{% include 'headerFooter/footer.html' %}
+</body>
+</html>
