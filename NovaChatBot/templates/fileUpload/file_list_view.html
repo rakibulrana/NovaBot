@@ -17,6 +17,7 @@
                     {{ file.name }} (Uploaded on: {{ file.uploaded_date }})
                     <a href="{% url 'edit_file' file.id %}" class="btn btn-primary btn-sm">Edit Name</a>
                     <a href="{% url 'delete_file' file.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    <a href="{% url 'display_csv_file' file.id %}" class="btn btn-secondary btn-sm">View Content</a>
                 </li>
             {% endfor %}
         </ul>

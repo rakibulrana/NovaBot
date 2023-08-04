@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Content</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    {% include 'NavBar/navbar.html' %}
+    <div class="container mt-5">
+        <h2>File Content</h2>
+        <pre>{{ file_content }}</pre>
+        <a href="{% url 'file_list_view' %}" class="btn btn-secondary">Back to File List</a>
+    </div>
+</body>
+{% include 'headerFooter/footer.html' %}
+</html>
