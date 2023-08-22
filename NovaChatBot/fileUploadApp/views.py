@@ -5,24 +5,37 @@ from .forms import UploadFileForm
 from django.contrib import messages
 
 import os
-from django.http import FileResponse #viewing and reading files
+from django.http import FileResponse  # viewing and reading files
 import csv
 
 
 def base(request):
     return render(request, 'base.html', {'year': 2023})
 
-
+# for git problem fixing comment
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            name = form.cleaned_data['name']
+            age = form.cleaned_data['age']
+            gender = form.cleaned_data['gender']
+            file = form.cleaned_data['file']
+
+            # Save the data or perform other actions
+            # For example:
+            new_entry = UploadedFile(name=name, age=age, gender=gender, file=file)
+            new_entry.save()
             messages.success(request, "File uploaded successfully!")
             return redirect('file_list_view')
+
+            # Redirect to a success page or perform other actions
     else:
         form = UploadFileForm()
     return render(request, 'fileUpload/upload_file.html', {'form': form})
+
+
+
 
 
 def display_csv_file(request, file_id):
@@ -76,10 +89,8 @@ def download_file(request, file_id):
 
 
 def sign_in(request):
-
     return render(request, 'loginController/signin.html')
 
 
 def save_user_signin_data(request):
-
     return render(request, 'fileUpload/upload_file.html')

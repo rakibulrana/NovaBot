@@ -6,6 +6,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('fileUploadApp.urls')),  # Include the app's URL patterns
+    path('ml_apps/', include('ml_apps.urls')),  # Add this line for the ml_apps app
+
 
 ]
 

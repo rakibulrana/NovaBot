@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Preprocessing</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Data Preprocessing</h2>
+        <p>File: {{ file.name }}</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Preprocess Data</button>
+        </form>
+    </div>
+</body>
+</html>

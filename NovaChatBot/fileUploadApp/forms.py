@@ -3,9 +3,20 @@ from .models import UploadedFile
 
 
 class UploadFileForm(forms.ModelForm):
+    name = forms.CharField(label='Name', max_length=100)
+    age = forms.IntegerField(label='Age')
+    GENDER_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other'),
+    ]
+    gender = forms.ChoiceField(label='Gender', choices=GENDER_CHOICES)
+
+    file = forms.FileField(label='File Upload')
+
     class Meta:
         model = UploadedFile
-        fields = ['name', 'file']
+        fields = ['name', 'age', 'gender', 'file']
 
     def clean_file(self):
         file = self.cleaned_data.get('file')
