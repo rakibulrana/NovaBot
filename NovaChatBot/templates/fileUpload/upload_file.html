@@ -6,59 +6,136 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Include FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css">
+    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+
+
 </head>
 <body>
 
 {% include 'NavBar/navbar.html' %}
-    <div class="container mt-5">
-        {% if messages %}
-            <div class="container mt-3">
-                {% for message in messages %}
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                {% endfor %}
+<div class="container mt-5">
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <h2>Upload File</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!--            <div class="form-group">-->
+        <!--                <label for="{{ form.name.id_for_label }}">Name</label>-->
+        <!--                {{ form.name }}-->
+        <!--            </div>-->
+
+        <!--            <div class="form-group">-->
+        <!--                <label for="{{ form.age.id_for_label }}">Age</label>-->
+        <!--                {{ form.age }}-->
+        <!--            </div>-->
+
+        <!--            <div class="form-group">-->
+        <!--                <label>Gender</label><br>-->
+        <!--                {{ form.gender }}-->
+        <!--            </div>-->
+
+
+        <!--        <div class="form-group">-->
+        <!--            <label for="{{ form.file.id_for_label }}">File Upload</label>-->
+        <!--            <div class="input-group">-->
+        <!--                {{ form.file }}-->
+        <!--                <div class="input-group-append">-->
+        <!--                    <a href="#" class="btn btn-warning" data-toggle="tooltip" data-placement="top"-->
+        <!--                       title="Click for more info of dataset formatting">-->
+        <!--                        <i class="fas fa-info-circle"></i>-->
+        <!--                    </a>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+
+
+        <!-- Add this button next to the file input field -->
+        {% load static %}
+<div class="input-group">
+    {{ form.file }}
+    <div class="input-group-append">
+        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#dataFormatModal">
+            <!-- Updated icon class to make it darker and bolder -->
+            <i class="fas fa-info-circle" style="color: #333; font-weight: bold;"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="dataFormatModal" tabindex="-1" role="dialog" aria-labelledby="dataFormatModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document"> <!-- Use modal-lg class for larger size -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dataFormatModalLabel">Data Format Information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-        {% endif %}
+            <div class="modal-body">
+                <!-- Add your formatting information here -->
+                <!-- ... -->
 
-        <h2>Upload File</h2>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label for="{{ form.name.id_for_label }}">Name</label>
-                {{ form.name }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ form.age.id_for_label }}">Age</label>
-                {{ form.age }}
-            </div>
-
-            <div class="form-group">
-                <label>Gender</label><br>
-                {{ form.gender }}
-            </div>
+                <!-- Sample Images -->
+                <div class="sample-images">
 
 
-            <div class="form-group">
-                <label for="{{ form.file.id_for_label }}">File Upload</label>
-                <div class="input-group">
-                    {{ form.file }}
-                    <div class="input-group-append">
-                        <a href="#" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Click for more info of dataset formatting">
-                            <i class="fas fa-info-circle"></i>
+                    <div id="image-slider" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <h5 style="color: #e61234">CSV Data Images</h5>
+                                <img src="{% static 'sample_images/csv.png' %}" class="d-block w-100"
+                                     alt="CSV Sample">
+                            </div>
+                            <div class="carousel-item">
+                                <h5 style="color: #e61234">JSON Data Images</h5>
+                                <img src="{% static 'sample_images/json.png' %}" class="d-block w-100"
+                                     alt="JSON Sample">
+                            </div>
+                            <div class="carousel-item">
+                                <h5 style="color: #e61234">XML Data Images</h5>
+                                <img src="{% static 'sample_images/xml.png' %}" class="d-block w-100"
+                                     alt="JSON Sample">
+                            </div>
+                            <!-- Add more images as needed -->
+                        </div>
+                        <a class="carousel-control-prev" href="#image-slider" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#image-slider" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
                         </a>
                     </div>
                 </div>
             </div>
-
-            <button type="submit" class="btn btn-primary">Upload</button>
-        </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
     </div>
+</div>
+
+
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+</div>
 
 </body>
 {% include 'headerFooter/footer.html' %}

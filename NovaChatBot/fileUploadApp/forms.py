@@ -3,20 +3,21 @@ from .models import UploadedFile
 
 
 class UploadFileForm(forms.ModelForm):
-    name = forms.CharField(label='Name', max_length=100)
-    age = forms.IntegerField(label='Age')
-    GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
-        ('O', 'Other'),
-    ]
-    gender = forms.ChoiceField(label='Gender', choices=GENDER_CHOICES)
+    # name = forms.CharField(label='Name', max_length=100)
+    # age = forms.IntegerField(label='Age')
+    # GENDER_CHOICES = [
+    #     ('M', 'Male'),
+    #     ('F', 'Female'),
+    #     ('O', 'Other'),
+    # ]
+    # gender = forms.ChoiceField(label='Gender', choices=GENDER_CHOICES)
 
     file = forms.FileField(label='File Upload')
 
     class Meta:
         model = UploadedFile
-        fields = ['name', 'age', 'gender', 'file']
+        #fields = ['name', 'age', 'gender', 'file']
+        fields = ['file']
 
     def clean_file(self):
         file = self.cleaned_data.get('file')
@@ -26,3 +27,4 @@ class UploadFileForm(forms.ModelForm):
             if ext not in allowed_formats:
                 raise forms.ValidationError(f"Invalid file format. Allowed formats are: {', '.join(allowed_formats)}")
         return file
+

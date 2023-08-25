@@ -34,7 +34,7 @@
       <tbody>
         {% for file in files %}
           <tr>
-            <td>{{ file.name }}</td>
+            <td>{{ file.original_name }}</td>
             <td>{{ file.uploaded_date }}</td>
             <td>
               <a href="{% url 'edit_file' file.id %}" class="btn btn-primary btn-sm">Edit File Name</a>

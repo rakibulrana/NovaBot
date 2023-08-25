@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Signal Visualization</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Signal Visualization</h2>
+
+        {% if validation_errors %}
+            <div class="alert alert-danger">
+                <strong>Errors:</strong>
+                <ul>
+                {% for error in validation_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if image_base64 %}
+            <img src="data:image/png;base64,{{ image_base64 }}" alt="Reconstructed Signals">
+        {% else %}
+            <p>No signal data available.</p>
+        {% endif %}
+
+        <a href="{% url 'preprocess_view' file_id %}" class="btn btn-primary">Back to Preprocessing</a>
+    </div>
+</body>
+</html>

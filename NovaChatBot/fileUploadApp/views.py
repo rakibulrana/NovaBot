@@ -1,9 +1,8 @@
+from datetime import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import UploadedFile
 from .forms import UploadFileForm
-
 from django.contrib import messages
-
 import os
 from django.http import FileResponse  # viewing and reading files
 import csv
@@ -12,19 +11,16 @@ import csv
 def base(request):
     return render(request, 'base.html', {'year': 2023})
 
+
 # for git problem fixing comment
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            name = form.cleaned_data['name']
-            age = form.cleaned_data['age']
-            gender = form.cleaned_data['gender']
             file = form.cleaned_data['file']
+            file_name = file.name
+            new_entry = UploadedFile(file=file, original_name=file_name)
 
-            # Save the data or perform other actions
-            # For example:
-            new_entry = UploadedFile(name=name, age=age, gender=gender, file=file)
             new_entry.save()
             messages.success(request, "File uploaded successfully!")
             return redirect('file_list_view')
@@ -35,11 +31,10 @@ def upload_file(request):
     return render(request, 'fileUpload/upload_file.html', {'form': form})
 
 
-
-
-
+# function for view data content, csv turns like working for all files!
 def display_csv_file(request, file_id):
     file = get_object_or_404(UploadedFile, id=file_id)
+
     if file.file:
         try:
             decoded_file = file.file.read().decode('utf-8')
@@ -63,8 +58,19 @@ def edit_file(request, file_id):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, instance=file)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'File name edited successfully.')
+            # Check if 'file' field has changed
+            if 'file' in form.changed_data:
+                # Update the file instance with the new file data
+                file = form.save(commit=False)
+                file.uploaded_date = timezone.now()  # Update the uploaded date
+                file.save()
+                messages.success(request, 'File name and file updated successfully.')
+            else:
+                # Only update the file name
+                file.original_name = form.cleaned_data['original_name']
+                file.save()
+                messages.success(request, 'File name updated successfully.')
+
             return redirect('file_list_view')
     else:
         form = UploadFileForm(instance=file)
