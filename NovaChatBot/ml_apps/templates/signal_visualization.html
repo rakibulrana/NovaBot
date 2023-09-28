@@ -4,6 +4,18 @@
     <title>Signal Visualization</title>
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Style for the image slice container */
+        #imageSliceContainer {
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Style for the image slice */
+        #imageCanvas {
+            cursor: crosshair; /* Set the cursor to a crosshair when hovering over the image */
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
@@ -20,13 +32,120 @@
             </div>
         {% endif %}
 
-        {% if image_base64 %}
-            <img src="data:image/png;base64,{{ image_base64 }}" alt="Reconstructed Signals">
-        {% else %}
-            <p>No signal data available.</p>
-        {% endif %}
+        <div id="imageSliceContainer">
+            <canvas id="imageCanvas"></canvas>
+        </div>
+
+        <button id="sliceButton" class="btn btn-primary">Slice Image</button>
+        <p id="selectionInfo"></p>
 
         <a href="{% url 'preprocess_view' file_id %}" class="btn btn-primary">Back to Preprocessing</a>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">Sliced Image</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="slicedImage" src="" alt="Sliced Image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const imageCanvas = document.getElementById('imageCanvas');
+        const sliceButton = document.getElementById('sliceButton');
+        const selectionInfo = document.getElementById('selectionInfo');
+
+        const ctx = imageCanvas.getContext('2d');
+
+        let img = new Image();
+        img.src = "data:image/png;base64,{{ image_base64 }}"; // Load the image from the backend
+
+        let isDragging = false;
+        let startX, startY, endX, endY;
+
+        img.onload = function () {
+            imageCanvas.width = img.width;
+            imageCanvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+        };
+
+        sliceButton.addEventListener('click', sliceImage);
+        imageCanvas.addEventListener('mousedown', startDragging);
+        imageCanvas.addEventListener('mousemove', drawSelectionBox);
+        imageCanvas.addEventListener('mouseup', endDragging);
+        imageCanvas.addEventListener('mouseleave', endDragging);
+
+        function startDragging(e) {
+            isDragging = true;
+            startX = e.offsetX;
+            startY = e.offsetY;
+        }
+
+        function endDragging(e) {
+            if (isDragging) {
+                endX = e.offsetX;
+                endY = e.offsetY;
+                isDragging = false;
+            }
+        }
+
+        function drawSelectionBox(e) {
+            if (isDragging) {
+                const x = e.offsetX;
+                const y = e.offsetY;
+
+                ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+                ctx.drawImage(img, 0, 0);
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.strokeRect(startX, startY, x - startX, y - startY);
+
+                const width = Math.abs(x - startX);
+                const height = Math.abs(y - startY);
+                const info = `X: ${startX}, Y: ${startY}, Width: ${width}, Height: ${height}`;
+                selectionInfo.textContent = info;
+            }
+        }
+
+        function sliceImage() {
+            if (img) {
+                const width = Math.abs(endX - startX);
+                const height = Math.abs(endY - startY);
+
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+                tempCtx.drawImage(img, startX, startY, width, height, 0, 0, width, height);
+
+                const slicedImage = new Image();
+                slicedImage.src = tempCanvas.toDataURL();
+                slicedImage.id = 'slicedImage'; // Set an id for the sliced image
+
+                // Populate the modal with the sliced image
+                const modalBody = document.querySelector('.modal-body');
+                modalBody.innerHTML = ''; // Clear any previous content
+                modalBody.appendChild(slicedImage);
+
+                // Show the modal
+                $('#imageModal').modal('show');
+            }
+        }
+    </script>
+
+    <!-- Include Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
