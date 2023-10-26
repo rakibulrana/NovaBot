@@ -10,7 +10,7 @@ import base64
 
 def preprocess_view(request, file_id):
     file = get_object_or_404(UploadedFile, id=file_id)
-    #print("------------> file >>>>>>>>>>>id ", file_id)
+
     file_content = None
     validation_errors = []
 
@@ -58,7 +58,7 @@ def preprocess_view(request, file_id):
 
 def signal_visualization_view(request, file_id):
     file = get_object_or_404(UploadedFile, id=file_id)
-    #-----------> file id:::::  Joy hok nanar: ", file_id)
+    # -----------> file id:::::  Joy hok nanar: ", file_id)
     file_content = None
     validation_errors = []
 

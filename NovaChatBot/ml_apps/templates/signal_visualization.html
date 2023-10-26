@@ -15,6 +15,11 @@
         #imageCanvas {
             cursor: crosshair; /* Set the cursor to a crosshair when hovering over the image */
         }
+
+        /* Style for the zoom buttons */
+        .zoom-btn {
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
@@ -36,15 +41,16 @@
             <canvas id="imageCanvas"></canvas>
         </div>
 
-        <button id="sliceButton" class="btn btn-primary">Slice Image</button>
         <p id="selectionInfo"></p>
+
+        <button id="enableSelection" class="btn btn-success">Signal Analyze</button> <!-- Add a new button to enable selection to analyze signal -->
 
         <a href="{% url 'preprocess_view' file_id %}" class="btn btn-primary">Back to Preprocessing</a>
     </div>
 
     <!-- Modal -->
     <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-xl" role="document"> <!-- Set modal-xl class for an extra-large modal -->
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="imageModalLabel">Sliced Image</h5>
@@ -52,8 +58,13 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="display: flex; justify-content: center; align-items: center;">
                     <img id="slicedImage" src="" alt="Sliced Image">
+                </div>
+                <div class="modal-footer">
+                    <!-- Zoom buttons -->
+                    <button class="btn btn-primary zoom-btn" onclick="zoomIn()">Zoom In</button>
+                    <button class="btn btn-primary zoom-btn" onclick="zoomOut()">Zoom Out</button>
                 </div>
             </div>
         </div>
@@ -61,16 +72,18 @@
 
     <script>
         const imageCanvas = document.getElementById('imageCanvas');
-        const sliceButton = document.getElementById('sliceButton');
         const selectionInfo = document.getElementById('selectionInfo');
+        const enableSelectionButton = document.getElementById('enableSelection'); // Reference to the enable selection button
 
         const ctx = imageCanvas.getContext('2d');
+        const tempCanvas = document.createElement('canvas'); // Create a temporary canvas for selections
 
         let img = new Image();
         img.src = "data:image/png;base64,{{ image_base64 }}"; // Load the image from the backend
 
         let isDragging = false;
         let startX, startY, endX, endY;
+        let zoomLevel = 1.0; // Initial zoom level
 
         img.onload = function () {
             imageCanvas.width = img.width;
@@ -78,14 +91,22 @@
             ctx.drawImage(img, 0, 0);
         };
 
-        sliceButton.addEventListener('click', sliceImage);
-        imageCanvas.addEventListener('mousedown', startDragging);
-        imageCanvas.addEventListener('mousemove', drawSelectionBox);
-        imageCanvas.addEventListener('mouseup', endDragging);
-        imageCanvas.addEventListener('mouseleave', endDragging);
+        // Add a click event listener to the enable selection button
+        enableSelectionButton.addEventListener('click', () => {
+            enableSelection(); // Call the enableSelection function when the button is clicked
+        });
+
+        function enableSelection() {
+            // Enable the selection functionality
+            imageCanvas.addEventListener('mousedown', startDragging);
+            imageCanvas.addEventListener('mousemove', drawSelectionBox);
+            imageCanvas.addEventListener('mouseup', endDragging);
+            imageCanvas.addEventListener('mouseleave', endDragging);
+        }
 
         function startDragging(e) {
             isDragging = true;
+            resetSelection(); // Reset the previous selection
             startX = e.offsetX;
             startY = e.offsetY;
         }
@@ -95,6 +116,9 @@
                 endX = e.offsetX;
                 endY = e.offsetY;
                 isDragging = false;
+
+                // Call the sliceImage function when selection is done
+                sliceImage();
             }
         }
 
@@ -108,11 +132,16 @@
                 ctx.strokeStyle = 'red';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 5]);
-                ctx.strokeRect(startX, startY, x - startX, y - startY);
 
-                const width = Math.abs(x - startX);
-                const height = Math.abs(y - startY);
-                const info = `X: ${startX}, Y: ${startY}, Width: ${width}, Height: ${height}`;
+                // Calculate the coordinates for the rectangle
+                const rectX = x > startX ? startX : x;
+                const rectY = y > startY ? startY : y;
+                const rectWidth = Math.abs(x - startX);
+                const rectHeight = Math.abs(y - startY);
+
+                ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
+
+                const info = `X: ${rectX}, Y: ${rectY}, Width: ${rectWidth}, Height: ${rectHeight}`;
                 selectionInfo.textContent = info;
             }
         }
@@ -122,11 +151,15 @@
                 const width = Math.abs(endX - startX);
                 const height = Math.abs(endY - startY);
 
-                const tempCanvas = document.createElement('canvas');
-                const tempCtx = tempCanvas.getContext('2d');
                 tempCanvas.width = width;
                 tempCanvas.height = height;
-                tempCtx.drawImage(img, startX, startY, width, height, 0, 0, width, height);
+                const tempCtx = tempCanvas.getContext('2d');
+
+                // Calculate the coordinates for the rectangle
+                const rectX = endX > startX ? startX : endX;
+                const rectY = endY > startY ? startY : endY;
+
+                tempCtx.drawImage(img, rectX, rectY, width, height, 0, 0, width, height);
 
                 const slicedImage = new Image();
                 slicedImage.src = tempCanvas.toDataURL();
@@ -140,6 +173,31 @@
                 // Show the modal
                 $('#imageModal').modal('show');
             }
+        }
+
+        // Function to reset the selection box and info
+        function resetSelection() {
+            ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+            ctx.drawImage(img, 0, 0);
+            selectionInfo.textContent = '';
+        }
+
+        // Function to zoom in the sliced image
+        function zoomIn() {
+            zoomLevel += 0.1;
+            updateZoom();
+        }
+
+        // Function to zoom out the sliced image
+        function zoomOut() {
+            zoomLevel -= 0.1;
+            updateZoom();
+        }
+
+        // Function to update the zoom level of the sliced image
+        function updateZoom() {
+            const slicedImage = document.getElementById('slicedImage');
+            slicedImage.style.transform = `scale(${zoomLevel})`;
         }
     </script>
 

@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'fileUploadApp',
     'ml_apps',
+    'pandas_profiling',
+
+
+
 
 
 ]
