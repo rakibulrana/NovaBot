@@ -11,13 +11,14 @@ from ydata_profiling import ProfileReport  # Import ProfileReport from ydata_pro
 profile_config = {
     "html.navbar_show": False,
 }
-
-
+# Import necessary libraries
 def preprocess_view(request, file_id):
     file = get_object_or_404(UploadedFile, id=file_id)
     file_content = None
     validation_errors = []
     profile_html = None
+    num_columns = 0  # Initialize the number of columns
+    column_names = []  # Initialize column names list
 
     if file.file:
         try:
@@ -44,6 +45,11 @@ def preprocess_view(request, file_id):
             if df.isnull().values.any():
                 df.fillna(0, inplace=True)  # You can fill NaN values with any appropriate value
 
+            # Dynamically generate column names based on the number of columns
+            num_columns = len(df.columns)
+            column_names = [f'channel{i}' for i in range(1, num_columns + 1)]
+            df.columns = column_names
+
             df_head = df.head()
             file_content = df.values.tolist()
 
@@ -57,7 +63,7 @@ def preprocess_view(request, file_id):
         # Generate the Pandas Profiling Report
         if file_content:
             # Create a DataFrame from your file_content
-            df = pd.DataFrame(file_content)
+            df = pd.DataFrame(file_content, columns=column_names)
 
             title = "Pandas Profiling Report"
 
@@ -73,6 +79,29 @@ def preprocess_view(request, file_id):
         'file_id': file.id,
         'df_head': df_head,
         'profile_html': profile_html,
+        'column_names': column_names,  # Pass the dynamically generated column names to the template
+        'num_columns': num_columns,  # Pass the number of columns to the template
+    })
+
+def visualize_channels(request, file_id):
+    # Get the selected channels from the URL
+    selected_channels = request.GET.get('channels').split(',')
+
+    # Fetch or generate the reconstructed data for the selected channels
+    reconstructed_data = {}  # A dictionary to store the reconstructed data
+
+    for channel in selected_channels:
+        # Replace this with your code to reconstruct the signal for each channel
+        # The reconstructed data should be in a format that can be plotted
+        # For this example, we use a simple list of values
+        reconstructed_signal = [value for value in range(1, 11)]
+
+        # Store the reconstructed signal in the dictionary
+        reconstructed_data[channel] = reconstructed_signal
+
+    return render(request, 'visualize_channels.html', {
+        'selected_channels': selected_channels,
+        'reconstructed_data': reconstructed_data,
     })
 
 
