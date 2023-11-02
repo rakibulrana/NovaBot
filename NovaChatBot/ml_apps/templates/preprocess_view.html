@@ -160,9 +160,10 @@
         // Collect the selected channels and perform further actions (e.g., visualization)
         const selectedChannels = [];
         $('input[type="checkbox"]:checked').each(function() {
-            if (this.id !== "optionAllChannels") {
-                selectedChannels.push(this.id);
-            }
+           if (this.id !== "optionAllChannels") {
+            const numericPart = this.id.replace("channel", ""); // Extract the numeric part
+            selectedChannels.push(numericPart); // Add the numeric part to the array
+        }
         });
 
         // Redirect or perform visualization based on selected channels

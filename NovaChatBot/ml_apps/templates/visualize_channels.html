@@ -3,47 +3,43 @@
 <head>
     <title>Channel Visualization</title>
     <!-- Include Plotly.js from the Plotly CDN -->
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <h1>Reconstructed Signals for Selected Channels</h1>
 
-    <!-- Loop through the selected channels and display reconstructed signals -->
-    <ul>
-        {% for channel in selected_channels %}
-            <li>{{ channel }}</li>
-            <!-- Display the reconstructed signal for the current channel -->
-            <div id="channel-{{ forloop.counter }}"></div>
-        {% endfor %}
-    </ul>
-
-    <!-- Include Plotly.js from the Plotly CDN -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Include a div to display the combined plot -->
+    <div id="combined-plot"></div>
 
     <script>
-    {% for channel, data in reconstructed_data.items %}
-    // Extract the data for the channel
-    var channelData{{ forloop.counter }} = {{ data|safe }};
+        // Initialize arrays to store data for the selected channels
+        var combinedData = [];
 
-    // Define the Plotly trace
-    var trace{{ forloop.counter }} = {
-        x: Array.from({ length: channelData{{ forloop.counter }}.length }, (_, i) => i), // Create x-axis values
-        y: channelData{{ forloop.counter }}, // Use the reconstructed data
-        mode: 'lines',  // Set the mode to 'lines' for line plot
-        name: '{{ channel }}',
-    };
+        // Loop through the selected channels and accumulate their data
+        {% for channel, data in reconstructed_data.items %}
+            // Extract the data for the channel
+            var channelData = {{ data|safe }};
 
-    // Define the layout for the plot
-    var layout{{ forloop.counter }} = {
-        title: '{{ channel }} Signal',
-        xaxis: { title: 'Time' },
-        yaxis: { title: 'Amplitude' },
-    };
+            // Create a trace for each channel with a unique color and label
+            var trace = {
+                x: Array.from({ length: channelData.length }, (_, i) => i),  // Create x-axis values
+                y: channelData,  // Use the channel's y-axis data
+                mode: 'lines',  // Set the mode to 'lines' for line plot
+                name: '{{ channel }}',  // Provide a name for the channel
+            };
 
-    // Create a Plotly plot for the channel
-    Plotly.newPlot('channel-{{ forloop.counter }}', [trace{{ forloop.counter }}], layout{{ forloop.counter }});
-    {% endfor %}
+            combinedData.push(trace);
+        {% endfor %}
+
+        // Define the layout for the combined plot
+        var combinedLayout = {
+            title: 'Combined Signals',
+            xaxis: { title: 'Time' },
+            yaxis: { title: 'Amplitude' },
+        };
+
+        // Create a Plotly plot for the combined signals with unique colors and labels
+        Plotly.newPlot('combined-plot', combinedData, combinedLayout);
     </script>
 </body>
 </html>

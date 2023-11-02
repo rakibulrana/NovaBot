@@ -7,11 +7,14 @@ import base64
 import pandas as pd
 from django.shortcuts import render, get_object_or_404
 from ydata_profiling import ProfileReport  # Import ProfileReport from ydata_profiling
+import plotly.graph_objs as go
+import json
 
 profile_config = {
     "html.navbar_show": False,
 }
-# Import necessary libraries
+
+
 def preprocess_view(request, file_id):
     file = get_object_or_404(UploadedFile, id=file_id)
     file_content = None
@@ -59,11 +62,13 @@ def preprocess_view(request, file_id):
     else:
         validation_errors.append("File not found.")
 
+    selected_channels = []  # Initialize the selected channels variable
     if request.method == "POST" and "generate_report" in request.POST:
         # Generate the Pandas Profiling Report
         if file_content:
             # Create a DataFrame from your file_content
             df = pd.DataFrame(file_content, columns=column_names)
+            selected_channels = df.columns  # Get the channel names from DataFrame
 
             title = "Pandas Profiling Report"
 
@@ -81,33 +86,64 @@ def preprocess_view(request, file_id):
         'profile_html': profile_html,
         'column_names': column_names,  # Pass the dynamically generated column names to the template
         'num_columns': num_columns,  # Pass the number of columns to the template
+        'selected_channels': selected_channels  # Pass selected channel names to the template
     })
+
 
 def visualize_channels(request, file_id):
-    # Get the selected channels from the URL
+    file = get_object_or_404(UploadedFile, id=file_id)
+
     selected_channels = request.GET.get('channels').split(',')
-
-    # Fetch or generate the reconstructed data for the selected channels
+    print(selected_channels, " Print my selected_:channels")
+    print(" My file id: ", file_id)
     reconstructed_data = {}  # A dictionary to store the reconstructed data
+    # dk = pd.DataFrame(file)
+    # print(dk)
+    if file.file:
+        try:
 
-    for channel in selected_channels:
-        # Replace this with your code to reconstruct the signal for each channel
-        # The reconstructed data should be in a format that can be plotted
-        # For this example, we use a simple list of values
-        reconstructed_signal = [value for value in range(1, 11)]
+            # Determine the file extension
+            file_extension = file.file.name.split('.')[-1].lower()
 
-        # Store the reconstructed signal in the dictionary
-        reconstructed_data[channel] = reconstructed_signal
+            if file_extension == 'csv':
+                df = pd.read_csv(file.file)
+            elif file_extension == 'txt':
+                df = pd.read_csv(file.file, delimiter='\t')
+            # Add more file format handling here as needed
+            else:
+                # Handle unsupported file formats
+                return render(request, 'error.html', {'error_message': 'Unsupported file format'})
 
-    return render(request, 'visualize_channels.html', {
-        'selected_channels': selected_channels,
-        'reconstructed_data': reconstructed_data,
-    })
+            selected_channels = [int(channel) - 1 for channel in selected_channels]
+            for col_idx, column_name in enumerate(df.columns):
+                if col_idx in selected_channels:
+                    channel_data = df[column_name].tolist()
+                    reconstructed_data[column_name] = channel_data
+            # for channel in selected_channels:
+            #     if channel in df.columns:
+            #         for i in 
+            #         # Retrieve data for the selected channel as a list
+            #         channel_data = df[channel].tolist()
+            #         reconstructed_data[channel] = channel_data
+
+            return render(request, 'visualize_channels.html', {
+                'selected_channels': selected_channels,
+                'reconstructed_data': reconstructed_data,
+            })
+
+        except Exception as e:
+            # Handle exceptions related to file processing
+            return render(request, 'error.html',
+                          {'error_message': f"Error occurred while processing the file: {str(e)}"})
+
+    else:
+        # Handle the case where the file is not found
+        return render(request, 'error.html', {'error_message': 'File not found'})
 
 
 def signal_visualization_view(request, file_id):
     file = get_object_or_404(UploadedFile, id=file_id)
-    # -----------> file id:::::  Joy hok nanar: ", file_id)
+
     file_content = None
     validation_errors = []
 
