@@ -141,6 +141,8 @@ def visualize_channels(request, file_id):
         return render(request, 'error.html', {'error_message': 'File not found'})
 
 
+
+
 def signal_visualization_view(request, file_id):
     file = get_object_or_404(UploadedFile, id=file_id)
 
