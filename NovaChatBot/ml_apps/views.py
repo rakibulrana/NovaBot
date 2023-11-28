@@ -1,14 +1,14 @@
 from fileUploadApp.models import UploadedFile
-
 import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
-
 import pandas as pd
+import numpy as np
 from django.shortcuts import render, get_object_or_404
 from ydata_profiling import ProfileReport  # Import ProfileReport from ydata_profiling
-import plotly.graph_objs as go
-import json
+from django.shortcuts import render
+import tsfel  # Import TSFEL or your feature extraction library
+from django.http import JsonResponse  # Import JsonResponse for AJAX responses
 
 profile_config = {
     "html.navbar_show": False,
@@ -114,7 +114,8 @@ def visualize_channels(request, file_id):
                 # Handle unsupported file formats
                 return render(request, 'error.html', {'error_message': 'Unsupported file format'})
 
-            selected_channels = [int(channel) - 1 for channel in selected_channels]
+            selected_channels = [int(channel) - 1 for channel in
+                                 selected_channels]  # usually got selected from the next one! therefore, we needed to correct.
             for col_idx, column_name in enumerate(df.columns):
                 if col_idx in selected_channels:
                     channel_data = df[column_name].tolist()
@@ -141,6 +142,105 @@ def visualize_channels(request, file_id):
         return render(request, 'error.html', {'error_message': 'File not found'})
 
 
+def view_features_calculation(request, file_id):
+    # file = get_object_or_404(UploadedFile, id=file_id)
+    #
+    # selected_channels = request.GET.get('channels').split(',')
+    #
+    # selected_features = request.GET.get('features').split(',')
+    #
+    # window_overlap_value = request.GET.get('windowOverLapValue').split(',')
+    # window_length = request.GET.get('windowLength').split(',')
+    file = get_object_or_404(UploadedFile, id=file_id)
+
+    selected_channels = [3, 4]
+    selected_features = [2, 3, 4]
+    window_overlap_value = 50
+    window_length = 12
+
+    if file.file:
+        try:
+
+            # Determine the file extension
+            file_extension = file.file.name.split('.')[-1].lower()
+
+            if file_extension == 'csv':
+                df = pd.read_csv(file.file)
+            elif file_extension == 'txt':
+                df = pd.read_csv(file.file, delimiter='\t')
+            # Add more file format handling here as needed
+            else:
+                # Handle unsupported file formats
+                return render(request, 'error.html', {'error_message': 'Unsupported file format'})
+
+            # Calculate mean for each selected channel
+            features_results = []
+
+            # usually got selected from the next one! therefore, we needed to correct.
+            selected_channels = [int(channel) - 1 for channel in selected_channels]
+            for col_idx, column_name in enumerate(df.columns):
+                if col_idx in selected_channels:
+                    channel_data = df[column_name].tolist()
+                    channel_features = feature_extraction(window_length, window_overlap_value, channel_data)
+                    features_results.append(channel_features)
+
+            transposed_stats = {
+                'mean': [],
+                'standard_deviation': [],
+                'maximum': [],
+                'minimum': []
+            }
+
+            # Populate the transposed_stats structure
+            for channel in features_results:
+                for stats in channel:
+                    transposed_stats['mean'].append(stats['mean'])
+                    transposed_stats['standard_deviation'].append(stats['standard_deviation'])
+                    transposed_stats['maximum'].append(stats['maximum'])
+                    transposed_stats['minimum'].append(stats['minimum'])
+
+            # Pass both features_results and transposed_stats to the template
+            return render(request, 'view_features_calculation.html', {
+                'features_results': features_results,
+                'transposed_stats': transposed_stats
+            })
+        except Exception as e:
+            # Handle exceptions related to file processing
+            return render(request, 'error.html',
+                          {'error_message': f"Error occurred while processing the file: {str(e)}"})
+
+    else:
+        # Handle the case where the file is not found
+        return render(request, 'error.html', {'error_message': 'File not found'})
+
+
+# Feature extraction window length, overlap selection function
+
+
+def feature_extraction(window_length, window_overlap_value, channel_data):
+    dataset = channel_data
+    window_size = window_length
+    overlap = window_overlap_value
+
+    step = max(int(window_size - window_size * overlap), 1)
+
+    # Initialize a list to store computed features
+    features = []
+
+    # Extract features for each window
+    for i in range(0, len(dataset), step):
+        window = dataset[i:i + window_size]
+
+        if len(window) == window_size:
+            window_features = {
+                'mean': np.mean(window),
+                'standard_deviation': np.std(window),
+                'maximum': np.max(window),
+                'minimum': np.min(window)
+            }
+            features.append(window_features)
+
+    return features
 
 
 def signal_visualization_view(request, file_id):

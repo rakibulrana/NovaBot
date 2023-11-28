@@ -2,16 +2,18 @@
 <html>
 <head>
     <title>Channel Visualization</title>
-    <!-- Include Plotly.js from the Plotly CDN -->
+    <!-- Include Plotly.js_NOVA from the Plotly CDN -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-    <h1>Reconstructed Signals for Selected Channels</h1>
+{% include 'NavBar/navbar.html' %}
 
-    <!-- Include a div to display the combined plot -->
-    <div id="combined-plot"></div>
+<h1>Reconstructed Signals for Selected Channels</h1>
 
-    <script>
+<!-- Include a div to display the combined plot -->
+<div id="combined-plot"></div>
+{% include 'headerFooter/footer.html' %}
+<script>
         // Initialize arrays to store data for the selected channels
         var combinedData = [];
 
@@ -40,6 +42,7 @@
 
         // Create a Plotly plot for the combined signals with unique colors and labels
         Plotly.newPlot('combined-plot', combinedData, combinedLayout);
-    </script>
+
+</script>
 </body>
 </html>
