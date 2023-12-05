@@ -53,20 +53,28 @@
         .custom-tab .table tbody tr:nth-child(odd) {
             background-color: #f8f9fa; /* Lighter row color for better readability */
         }
+
     </style>
 </head>
 <body>
 
-{% include 'NavBar/navbar.html' %} <!-- Include the navigation bar -->
+{% include 'NavBar/navbar.html' %}
 
 <div class="container mt-3 custom-tab">
     <!-- Main Tab Navigation -->
     <ul class="nav nav-tabs" id="mainTab" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="feature-matrix-tab" data-toggle="tab" href="#featureMatrix" role="tab" aria-controls="featureMatrix" aria-selected="true">Feature Matrix</a>
+            <a class="nav-link active" id="feature-matrix-tab" data-toggle="tab" href="#featureMatrix" role="tab"
+               aria-controls="featureMatrix" aria-selected="true">Feature Matrix</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="transposed-matrix-tab" data-toggle="tab" href="#transposedMatrix" role="tab" aria-controls="transposedMatrix" aria-selected="false">Transposed Matrix</a>
+            <a class="nav-link" id="transposed-matrix-tab" data-toggle="tab" href="#transposedMatrix" role="tab"
+               aria-controls="transposedMatrix" aria-selected="false">Transposed Matrix</a>
+        </li>
+
+         <li class="nav-item">
+            <a class="nav-link" id="forOtherOption" data-toggle="tab" href="#futureFeature" role="tab"
+               aria-controls="transposedMatrix" aria-selected="false">Future feature</a>
         </li>
     </ul>
 
@@ -74,68 +82,62 @@
     <div class="tab-content" id="mainTabContent">
         <!-- Feature Matrix Tab Pane -->
         <div class="tab-pane fade show active" id="featureMatrix" role="tabpanel" aria-labelledby="feature-matrix-tab">
-            <div class="tab-pane fade show active" id="featureMatrix" role="tabpanel" aria-labelledby="feature-matrix-tab">
             <!-- Inner Tab Navigation for Feature Matrix -->
-            <ul class="nav nav-tabs" id="featureInnerTab" role="tablist">
-                {% for statistic in feature_stats %}
+            <ul class="nav nav-tabs" id="channelTab" role="tablist">
+                {% for channel_data in features_results %}
                 <li class="nav-item">
-                    <a class="nav-link {% if forloop.first %}active{% endif %}" id="{{ statistic }}-tab" data-toggle="tab" href="#{{ statistic }}" role="tab" aria-controls="{{ statistic }}" aria-selected="true">{{ statistic|capfirst }}</a>
+                      <a class="nav-link {% if forloop.first %}active{% endif %}" id="channel-tab-{{ forloop.counter }}"
+                       data-toggle="tab" href="#channel{{ forloop.counter }}" role="tab"
+                       aria-controls="channel{{ forloop.counter }}" aria-selected="true">Channel </a>
                 </li>
                 {% endfor %}
             </ul>
 
-            <!-- Inner Tab Content for Feature Matrix -->
-            <div class="tab-content" id="featureInnerTabContent">
-                {% for statistic, values in feature_stats.items %}
-                <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="{{ statistic }}" role="tabpanel" aria-labelledby="{{ statistic }}-tab">
-                    <table class="table" id="table{{ statistic }}">
+            <!-- Tab Content -->
+            <div class="tab-content" id="channelTabContent">
+                {% for channel_data in features_results %}
+                <div class="tab-pane fade {% if forloop.first %}show active{% endif %}"
+                     id="channel{{ forloop.counter }}"
+                     role="tabpanel" aria-labelledby="channel-tab-{{ forloop.counter }}">
+                    <table class="table" id="dataTable{{ forloop.counter }}">
                         <thead>
-                            <tr>
-                                <th>Channel</th>
-                                {% for value in values %}
-                                <th>{{ value }}</th>
-                                {% endfor %}
-                            </tr>
+                        <tr>
+                            <th>Window</th>
+                            <th>Mean</th>
+                            <th>Standard Deviation</th>
+                            <th>Minimum</th>
+                            <th>Maximum</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>{{ statistic|capfirst }}</td>
-                                {% for value in values %}
-                                <td>{{ value }}</td>
-                                {% endfor %}
-                            </tr>
+                        {% for window_data in channel_data %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ window_data.mean }}</td>
+                            <td>{{ window_data.standard_deviation }}</td>
+                            <td>{{ window_data.minimum }}</td>
+                            <td>{{ window_data.maximum }}</td>
+                        </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 {% endfor %}
+            </div>
         </div>
 
-        <!-- Transposed Matrix Tab Pane -->
         <div class="tab-pane fade" id="transposedMatrix" role="tabpanel" aria-labelledby="transposed-matrix-tab">
-            <table class="table" id="transposedTableMean">
-                <thead>
-                    <tr>
-                        <th>Channel</th>
-                        {% for value in transposed_stats.mean %}
-                        <th>Mean {{ forloop.counter }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Mean</td>
-                        {% for value in transposed_stats.mean %}
-                        <td>{{ value }}</td>
-                        {% endfor %}
-                    </tr>
-                </tbody>
-            </table>
-            <!-- Repeat the above table structure for standard_deviation, maximum, and minimum -->
+            <!-- Content for Transposed Matrix -->
+            <p>Content for Transposed Matrix</p>
+        </div>
+         <div class="tab-pane fade" id="futureFeature" role="tabpanel" aria-labelledby="transposed-matrix-tab">
+            <!-- Content for Transposed Matrix -->
+            <p>Future Feature</p>
         </div>
     </div>
 </div>
 
-{% include 'headerFooter/footer.html' %} <!-- Include the footer -->
+{% include 'headerFooter/footer.html' %}
 
 <!-- Bootstrap and jQuery scripts -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -148,8 +150,17 @@
     $(document).ready(function() {
         // Initialize DataTables for each table
         $('.table').DataTable();
+
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var channelTabs = document.querySelectorAll('#channelTab a');
+        channelTabs.forEach(function(tab, index) {
+            tab.textContent = 'Channel ' + (index + 1);
+        });
     });
 </script>
 
 </body>
 </html>
+

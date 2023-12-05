@@ -143,20 +143,37 @@ def visualize_channels(request, file_id):
 
 
 def view_features_calculation(request, file_id):
-    # file = get_object_or_404(UploadedFile, id=file_id)
-    #
-    # selected_channels = request.GET.get('channels').split(',')
-    #
-    # selected_features = request.GET.get('features').split(',')
-    #
-    # window_overlap_value = request.GET.get('windowOverLapValue').split(',')
-    # window_length = request.GET.get('windowLength').split(',')
     file = get_object_or_404(UploadedFile, id=file_id)
+    #
+    selected_channels = request.GET.get('channels').split(',')
+    #
+    selected_features = request.GET.get('features').split(',')
+    window_overlap_value = request.GET.get('windowOverLapValue')
+    window_length = request.GET.get('windowLength')
 
-    selected_channels = [3, 4]
-    selected_features = [2, 3, 4]
-    window_overlap_value = 50
-    window_length = 12
+    print("channels: ", selected_channels)
+    print("features: ", selected_features)
+    print("Window overlap: ", window_overlap_value)
+    print("Window length: ", window_length)
+    file = get_object_or_404(UploadedFile, id=file_id)
+    try:
+        if window_overlap_value:
+            window_overlap_value = int(window_overlap_value)
+        else:
+            window_overlap_value = 0  # Default value if not provided
+
+        if window_length:
+            window_length = int(window_length)
+        else:
+            window_length = 0  # Default value if not provided
+    except ValueError:
+        # Handle the case where the conversion to integer fails
+        pass
+
+        print("channels: ", selected_channels)
+        print("features: ", selected_features)
+        print("Window overlap: ", window_overlap_value)
+        print("Window length: ", window_length)
 
     if file.file:
         try:
