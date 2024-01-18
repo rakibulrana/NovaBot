@@ -1,48 +1,235 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Channel Visualization</title>
-    <!-- Include Plotly.js_NOVA from the Plotly CDN -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+       .features-list {
+          height: 2x;
+    overflow-y: auto; /* Allows vertical scrolling if content is taller than the container */
+    /* border: 1px solid #ddd;*/
+    padding: 10px;
+    min-width: 200px; /* Adjust this value based on your layout needs */
+    box-sizing: border-box;
+
+    }
+    .error {
+            border: 2px solid red;
+        }.select-all {
+    margin-bottom: 10px;
+    }
+    .category-div {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }.category-header {
+        margin-bottom: 10px;
+    }
+
+    .form-check {
+        margin-bottom: 5px;
+    }
+
+    .form-check-input {
+        margin-right: 5px;
+        cursor: pointer;
+    }
+
+    .form-check-label {
+        cursor: pointer;
+    }.vertical-slider {
+      transform: rotate(-90deg);
+      position: absolute;
+      right: -50px; /* Adjust as needed for proper alignment */
+      width: 200px; /* This becomes the height after rotation */
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .checkboxes-div {
+        margin-left: 10px; /* Lesser indent on smaller screens */
+    }
+}
+
+
+
+
+
+
+
+    </style>
+
 </head>
 <body>
+{% load static %}
 {% include 'NavBar/navbar.html' %}
+<div class="container mt-4">
+    <div class="navbar navbar-expand-lg navbar-light bg-light mb-4 justify-content-center">
+        <div class="text-center">
+            <span class="navbar-brand mb-0 h1">Data</span>
+        </div>
+    </div>
+    <ul class="nav nav-tabs" id="mainTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="configuration-tab" data-toggle="tab" href="#configurationTab" role="tab"
+               aria-controls="FeaturesPlots" aria-selected="true">Configuration</a>
+        </li>
 
-<h1>Reconstructed Signals for Selected Channels</h1>
+        <li class="nav-item">
+            <a class="nav-link" id="features-plot-tab" data-toggle="tab" href="#featuresPlotTab" role="tab"
+               aria-controls="featuresPotTab" aria-selected="false">Features Plot</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="self-similarity-matrix" data-toggle="tab" href="#selfSimilarityMatrix" role="tab"
+               aria-controls="selfSimilarityMatrix" aria-selected="false">SSM</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="mainTabContent">
+        <div class="tab-pane fade show active" id="configurationTab" role="tabpanel"
+             aria-labelledby="configuration-tab">
+            <div class="row border p-5">
+                <div class="col-md-10 ">
+                    <div style="height: 400px; position: static;" id="combined-plot">
+                        <!-- Plotly graph will be inserted here -->
+                    </div>
 
-<!-- Include a div to display the combined plot -->
-<div id="combined-plot"></div>
+                </div>
+                <div class="col-md-2">
+                    <div class="row"><br><br><br><br><br></div>
+                    <div class="form-check me-3">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="select-all"
+                               value="option1" checked>
+                        <label class="form-check-label" for="select-all">
+                            Select all
+                        </label><br>
+                    </div>
+
+                    <div class=" me-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="exampleRadios" id="deselect-all"
+                                   value="option2">
+                            <label class="form-check-label" for="deselect-all">
+                                Deselect all
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column for Radio Buttons and Options -->
+
+                <!-- Buttons for selecting/deselecting all channels -->
+
+                <br>
+            </div>
+            <br>
+            <div class="row border p-5 ">
+
+                <div class="container mt-3"> <!-- Adjusted to mt-3 for proper spacing -->
+                    <div class="row">
+                        <div class="col-md-12"> <!-- Adjusted to 12 columns for a full-width row -->
+                            <h5>Features</h5>
+                            <div class="features-list d-flex flex-wrap gap-2" id="featuresList">
+                                <!-- Dynamic checkboxes will be added here -->
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selectAll">
+                                </div>
+                                <!-- More checkboxes can be added dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <br>
+            <div class="row border p-5">
+                <div class="col-md-6">
+                    <label for="window-length" class="form-label">Window Length (Sample):</label>
+                    <input type="number" class="form-control" id="window-length" placeholder="Enter value (0-50)">
+                    <input type="range" min="0" max="50" value="25" class="slider" id="window-length-range">
+                    <p id="error-message" class="error-message">Value cannot exceed 50%</p>
+                </div>
+                <div class="col-md-2">
+                    <label for="windowOverlap" class="form-label text-center">Window Overlap</label>
+                    <h4 class="text-center">
+                        <span class="percent">5%</span>
+                    </h4>
+                    <input type="range" min="5" max="95" value="5" class="slider form-range" id="windowOverlap"
+                           step="5">
+                </div>
+                <div class="col-md-4">
+                    <a href="#" class="btn btn-primary mt-3">Feature & Channel Selection</a>
+                </div>
+            </div>
+            <br> <br> <br>
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    <button id="submit-button" class="btn btn-primary">Submit</button>
+                    <button id="cancelButton" class="btn btn-danger">Cancel</button>
+                </div>
+            </div>
+            <br> <br>
+            <div class="progress mdb-3">
+                <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0"
+                     aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+        <!-- Placeholder for the output graph -->
+
+        <div class="tab-pane fade" id="featuresPlotTab" role="tabpanel" aria-labelledby="features-plot-tab">
+            <div class="border p-5 text-center">
+                <div id="combined-plot-1">
+                    <!-- Plotly graph will be inserted here -->
+                </div>
+            </div>
+
+        </div>
+        <div class="tab-pane fade" id="selfSimilarityMatrix" role="tabpanel" aria-labelledby="self-similarity-matrix">
+            <!-- Inner Tabs Navigation -->
+            <ul class="nav nav-tabs" id="innerTab" role="tablist">
+                <!-- New tabs will be dynamically added here -->
+            </ul>
+
+            <!-- Inner Tabs Content -->
+            <div class="tab-content" id="innerTabContent">
+                <!-- New content panes will be dynamically added here -->
+            </div>
+        </div>
+
+
+    </div>
+</div>
 {% include 'headerFooter/footer.html' %}
+
+<script src="{% static 'js/ml_features_calculation.js' %}"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 <script>
-        // Initialize arrays to store data for the selected channels
-        var combinedData = [];
 
-        // Loop through the selected channels and accumulate their data
-        {% for channel, data in reconstructed_data.items %}
-            // Extract the data for the channel
-            var channelData = {{ data|safe }};
+     // Loop through the selected channels and accumulate their data
+    {% for channel, data in reconstructed_data.items %}
+        // Extract the data for the channel
+        var channelData = {{ data|safe }};
 
-            // Create a trace for each channel with a unique color and label
-            var trace = {
-                x: Array.from({ length: channelData.length }, (_, i) => i),  // Create x-axis values
-                y: channelData,  // Use the channel's y-axis data
-                mode: 'lines',  // Set the mode to 'lines' for line plot
-                name: '{{ channel }}',  // Provide a name for the channel
-            };
-
-            combinedData.push(trace);
-        {% endfor %}
-
-        // Define the layout for the combined plot
-        var combinedLayout = {
-            title: 'Combined Signals',
-            xaxis: { title: 'Time' },
-            yaxis: { title: 'Amplitude' },
+        // Create a trace for each channel
+        var trace = {
+            x: Array.from({ length: channelData.length }, (_, i) => i),
+            y: channelData,
+            mode: 'lines',
+            name: '{{ channel }}',
         };
+        combinedData.push(trace);
+    {% endfor %}
 
-        // Create a Plotly plot for the combined signals with unique colors and labels
-        Plotly.newPlot('combined-plot', combinedData, combinedLayout);
+
+
 
 </script>
 </body>
+
 </html>

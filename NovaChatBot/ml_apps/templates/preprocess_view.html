@@ -44,6 +44,7 @@
 
 
 
+
     </style>
 </head>
 <body>
@@ -53,10 +54,12 @@
     <h2 class="text-center">Data Analysis and Visualization</h2>
     <!-- Left section: Display feature selection and reconstruct signal -->
     <div class="col-md-12">
-        <a href="{% url 'signal_visualization_view' file_id %}" class="btn btn-primary mt-3">Reconstruct Signal</a>
-        <a data-target="#myModal" data-toggle="modal" class="btn btn-primary mt-3" id="MainNavHelp" href="#myModal">Signal
-            Customization</a>
-        <a data-target="#myModalVisualization" data-toggle="modal" class="btn btn-primary mt-3" id="visualizationId" href="#myModal">Visualization</a>
+        <a href="{% url 'visualize_channels' file_id %}" class="btn btn-primary mt-3">Signal
+            Customizationl</a>
+        <!--        <a data-target="#myModal" data-toggle="modal" class="btn btn-primary mt-3" id="MainNavHelp" href="#myModal">Signal-->
+        <!--            Customization</a>-->
+        <a data-target="#myModalVisualization" data-toggle="modal" class="btn btn-primary mt-3" id="visualizationId"
+           href="#myModal">Visualization</a>
         <a data-target="#feature_channel_selection_modal" data-toggle="modal" class="btn btn-primary mt-3"
            id="feature_channel_selection_modal_btn" href="#feature_channel_selection_modal">Feature & Channel
             Selection</a>
@@ -354,6 +357,7 @@
             });
 
             menu.appendChild(a);
+
         });
     }
 
@@ -421,6 +425,7 @@ $(document).ready(function() {
             percent.textContent = value + '%';
           });
         });
+
 
 
 </script>

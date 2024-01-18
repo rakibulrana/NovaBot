@@ -16,7 +16,6 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -27,7 +26,6 @@ SECRET_KEY = 'django-insecure-vwi%n3+we)j1*jmtr(8b90w05x8x3qggwfq)p^lzzi44$ept$*
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -42,10 +40,7 @@ INSTALLED_APPS = [
     'fileUploadApp',
     'ml_apps',
     'pandas_profiling',
-
-
-
-
+    'rest_framework',
 
 ]
 
@@ -79,7 +74,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'NovaChatBot.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -89,7 +83,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -109,7 +102,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -121,28 +113,30 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-#STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
 
 STATIC_URL = '/static/'
+
+STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [
-    BASE_DIR / "fileUploadApp/static",
+    BASE_DIR / "static",  # This should point to the global 'static' directory
+    # BASE_DIR / "fileUploadApp/static",  # Uncomment this if you also have static files in the app-specific directory
 ]
 
-
 # Static files settings ML_App
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-
 # Media settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
