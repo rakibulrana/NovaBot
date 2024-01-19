@@ -41,12 +41,31 @@
 
     .form-check-label {
         cursor: pointer;
-    }.vertical-slider {
-      transform: rotate(-90deg);
-      position: absolute;
-      right: -50px; /* Adjust as needed for proper alignment */
-      width: 200px; /* This becomes the height after rotation */
-    }
+    }.vertical-slider-container {
+    width: 50px; /* Adjust width as needed */
+    height: 200px; /* Adjust height as needed */
+    margin: 0 auto; /* Center the container */
+    position: relative; /* Positioning context for absolute children */
+}
+
+.vertical-slider {
+    -webkit-appearance: slider-vertical; /* For WebKit browsers */
+    width: 50px; /* Adjust width as needed */
+    height: 200px; /* Full height of container */
+    writing-mode: bt-lr; /* IE */
+    -webkit-transform: rotate(270deg); /* For WebKit browsers */
+    transform: rotate(270deg); /* Standard syntax */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}.button {
+    position: absolute;
+    top: 100%; /* Position the button below the slider */
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 10px; /* Add some space between the slider and the button */
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -152,21 +171,23 @@
                     <input type="range" min="0" max="50" value="25" class="slider" id="window-length-range">
                     <p id="error-message" class="error-message">Value cannot exceed 50%</p>
                 </div>
-                <div class="col-md-2">
-                    <label for="windowOverlap" class="form-label text-center">Window Overlap</label>
-                    <h4 class="text-center">
-                        <span class="percent">5%</span>
-                    </h4>
-                    <input type="range" min="5" max="95" value="5" class="slider form-range" id="windowOverlap"
-                           step="5">
+                <div class="col-md-6">
+                        <label for="windowOverlap" class="form-label text-center">Window Overlap</label>
+
+                        <input type="number" class="form-control percent" id="windowOverlapInput" placeholder="Enter value (0-99)">
+                        <input type="range" min="0" max="99" value="0" class="slider form-range" id="windowOverlap"
+                               step="1">
+
+                         <p id="errorMessageOverlap" class="error-message">Value cannot exceed 100%</p>
                 </div>
-                <div class="col-md-4">
-                    <a href="#" class="btn btn-primary mt-3">Feature & Channel Selection</a>
-                </div>
-            </div>
+<!--                </div>-->
+<!--                <div class="col-md-4">-->
+<!--                    <a href="#" class="btn btn-primary mt-3">Feature & Channel Selection</a>-->
+<!--                </div>-->
+                 </div>
             <br> <br> <br>
             <div class="row justify-content-center">
-                <div class="col-auto">
+                <div class="col-auto ">
                     <button id="submit-button" class="btn btn-primary">Submit</button>
                     <button id="cancelButton" class="btn btn-danger">Cancel</button>
                 </div>

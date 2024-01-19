@@ -24,7 +24,14 @@
 
     // Function to update the plot
     function updatePlot(newData) {
+        console.log(newData)
         Plotly.react('combined-plot', newData, combinedLayout);
+        globalZoomedChannelData = newData.map(function(trace) {
+            return {
+                name: trace.name,               // channel name from newData
+                data: trace.y                   // the y-values from newData
+            };
+        });
     }
      function updatePlot1(newData) {
         Plotly.react('combined-plot-1', newData, combinedLayout);
@@ -295,6 +302,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+//This function is working for Overlap and rage bar for window length workable
+document.addEventListener('DOMContentLoaded', function() {
+    var inputField = document.getElementById("windowOverlapInput");
+    var rangeSlider = document.getElementById("windowOverlap");
+    var errorMessage = document.getElementById("errorMessageOverlap");
+
+    function updateValues(value) {
+        if (value > 99) {
+            errorMessage.style.display = 'block';
+            inputField.classList.add("error");
+            value = 99;
+        } else {
+            errorMessage.style.display = 'none';
+            inputField.classList.remove("error");
+        }
+        inputField.value = value;
+        rangeSlider.value = value;
+    }
+
+    rangeSlider.oninput = function() {
+        updateValues(this.value);
+    }
+
+    inputField.oninput = function() {
+        updateValues(this.value);
+    }
+});
+
 
 // Getting value for submit
 
@@ -409,12 +444,16 @@ function updateTabPanel(data, globalZoomedChannelData) {
     newContent.role = 'tabpanel';
     newContent.innerHTML = `
         <div class="row">
-            <div class="col-md-9 border p-5 text-center">
+            <div class="col-md-9  text-center">
                 <div id="${tempZoomedChannelData}"></div>
                 <div id="${plotDivIdSSM}"></div>
+            </div>
+        </div>
+         <div class="row">
+            <div class="col-md-9  text-center">
                 <div id="${plotDivIdNOV}"></div>
             </div>
-            <div class="col-md-3 border p-5 text-center">
+            <div class="col-md-3  text-center">
                 <input type="range" class="vertical-slider" id="scroller${timestamp}" min="0" max="10" step="0.1" value="5" oninput="updateHorizontalLine(this.value, '${plotDivIdNOV}', '${timestamp}')" orient="vertical" style="height: 200px;" />
                 <button onclick="printNearestPoint('${plotDivIdNOV}', '${JSON.stringify(data.nov_ssm)}')">Print Nearest Point</button>
             </div>

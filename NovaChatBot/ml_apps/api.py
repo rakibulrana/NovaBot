@@ -19,7 +19,7 @@ def my_api_view(request):
         window_length = int(received_data.get('windowLength', 0))
         window_overlap = int(received_data.get('windowOverlap', 0))
         features_list = [feature for category in selected_features.values() for feature in category]
-        print("Selected Feature: ",features_list)
+
 
         if zoomed_channel_data and 'data' in zoomed_channel_data[0]:
             first_col_len = len(zoomed_channel_data[0]['data'])
@@ -57,7 +57,7 @@ def my_api_view(request):
         S_array = np.array(S) if isinstance(S, list) else S
         kernel_size = 10  # This should be an integer value representing half the kernel size
         nov_ssm = compute_novelty(S_array, kernel_size).tolist()
-        print("nov_ssm function has completed")
+
     # If it's not a POST request, maybe return a 400 Bad Request
     return JsonResponse({'ssm_data': S, 'nov_ssm': nov_ssm})
 
